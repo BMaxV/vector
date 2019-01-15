@@ -123,6 +123,7 @@ class Matrix:
    
 
 def RotationMatrix(angle,rot_axis):
+    """angle in radians"""
     c=math.cos(angle)
     s=math.sin(angle)
     x=rot_axis.x
@@ -162,6 +163,8 @@ class Vector:
             raise ValueError
     
     def __eq__(self,other):
+        if type(other)!=type(self):
+            return False
         if len(self)!=len(other):
             return False
         c=0
