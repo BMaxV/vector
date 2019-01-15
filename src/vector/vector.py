@@ -184,6 +184,8 @@ class Vector:
                 #n_expr=expr
             #n_exprs.append(n_expr)
         #return Vector(*n_exprs)
+    def copy(self):
+        return Vector(self.x,self.y,self.z)
         
     def cross(self,other):
         new_x=self.y*other.z-self.z*other.y
@@ -232,7 +234,7 @@ class Vector:
     
         
     def __sub__(self,v2):
-        return vector3d(self[0]-v2[0],self[1]-v2[1],self[2]-v2[2])
+        return Vector(self[0]-v2[0],self[1]-v2[1],self[2]-v2[2])
     
     def __add__(self,v2):
         return Vector(self[0]+v2[0],self[1]+v2[1],self[2]+v2[2])
