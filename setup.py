@@ -10,7 +10,7 @@ def read(fname):
 
 setuptools.setup(
     name = "vector",
-    version = "0.12",
+    version = "0.13",
     author = "Brumo Maximilian Voss",
     author_email = "bruno.m.voss@gmail.com",
     description = ("perform common 3d vector operations"),

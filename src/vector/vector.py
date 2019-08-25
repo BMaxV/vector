@@ -75,7 +75,7 @@ class Matrix:
         m=3
         while c1 < m:
             while c2 < m:
-                s+=str(self[c1][c2])
+                s+=str(self[c1][c2])+" "
                 c2+=1
             s+="\n"
             c2=0
@@ -114,6 +114,9 @@ class Matrix:
 
 
     def form_Rotation(self,target,z):
+        """ takes two vectors, rotation axis is calculated as cross product
+        then rotation is applied as acos of the dot product"""
+        
         rot_axis=target.cross(z)
         angle=math.acos(target.dot(z))
         M=self.Rotation(angle,None,rot_axis)
@@ -175,7 +178,35 @@ class Vector:
             c+=1
        
         return True
+    
+    def angle_to_other(self,other):
+        """the angle between two vectors
+        
+        in radians
+        
+        """
+        if type(other)!=type(self):
+            raise TypeError
+        
 
+        v1=self
+        v2=other
+        
+        m1=round(v1.magnitude(),3)
+        m2=round(v2.magnitude(),3)
+        
+        try:
+            v1=v1.copy()
+            v2=v2.copy()
+            v1=v1.normalize()
+            v2=v2.normalize()
+        except:
+            print("vectors must be normalized, no methods give to support that")
+        #print(v1,v2)
+        ang=math.acos((v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2]))
+        return ang
+    
+    
     def subs(self,d=None):
         raise NotImplemented
         #n_exprs=[]
