@@ -147,6 +147,10 @@ class Vector:
         common vector funtions.
         """
         
+        #duck type check
+        1+x,1+y,1+z
+        
+        
         self.x = x 
         self.y = y 
         self.z = z 
@@ -272,8 +276,6 @@ class Vector:
     
     def __add__(self,v2):
         return Vector(self[0]+v2[0],self[1]+v2[1],self[2]+v2[2])
-    
-    
     
     def dot(self,v2):
         v1=self
