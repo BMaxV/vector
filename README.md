@@ -12,6 +12,7 @@ I just wanted something where the operations I wanted where just there and not s
 
  * it's straightforward, see:
 
+```
 import math
 from vector import vector
 
@@ -25,6 +26,7 @@ new
 >>>(-1.0, 1.2246467991473532e-16, 0.0)
 >>> round(new,3)
 (-1.0, 0.0, 0.0)
+```
 
 
 
