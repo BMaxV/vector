@@ -28,15 +28,47 @@ class TestGeom(unittest.TestCase):
         r=v.dot(v2)
         assert r==2
     
-    def test_vars(self):
-        from goodmath import symbol,boiler,solvers
+    def test_vector_interpolate(self):
+        v1=vector.Vector(1,0,0)
+        v2=vector.Vector(0,1,0)
         
-        x,y,z=symbol.symbols(["x","y","z"])
-        v=vector.Vector(x,y,z)
-        v2=vector.Vector(1,1,0)
-        r=v.dot(v2)
-        print(r)
-        assert r == boiler.sympify("x*1+y*1+z*0")
+        stepsize=0.5
+        while True:
+            v1=vector.vector_interpolation_step(v1,v2,stepsize)
+            rads_diff=vector.angle_v1v2(v1,v2)
+            if abs(rads_diff)<stepsize:
+                break
+        
+        v1=vector.Vector(1,0,0)
+        v2=vector.Vector(0,1,0)
+        
+        while True:
+            v1=vector.vector_interpolation_step(v1,v2,stepsize)
+            rads_diff=vector.angle_v1v2(v1,v2)
+            if abs(rads_diff)<stepsize:
+                break
+        
+        v1=vector.Vector(1,1,0)
+        v1=v1.normalize()
+        v2=vector.Vector(1,-1,0)
+        v2=v2.normalize()
+        while True:
+            v1=vector.vector_interpolation_step(v1,v2,stepsize)
+            rads_diff=vector.angle_v1v2(v1,v2)
+            if abs(rads_diff)<stepsize:
+                break
+        
+        v1=vector.Vector(1,1,0)
+        v1=v1.normalize()
+        v2=vector.Vector(1,-1,0)
+        v2=v2.normalize()
+        
+        while True:
+            v1=vector.vector_interpolation_step(v1,v2,stepsize)
+            rads_diff=vector.angle_v1v2(v1,v2)
+            
+            if abs(rads_diff)<stepsize:
+                break
         
 if __name__=="__main__":
     unittest.main()

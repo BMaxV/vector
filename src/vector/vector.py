@@ -7,48 +7,27 @@ you want to do. It'll rather do it and fail gracefull.
 
 """
 
-#def basic_xyz():
-#    return sympy.symbols("x y z")
 
-def curl():#vectorfield,base_symbols=basic_xyz()):
+def curl():
     raise NotImplemented
     """
     Takes a vectorfield and the base symbols to be differentiated with.
     If no base is provided, sympy symbols x,y,z are assumed.
     """
     
-    #x,y,z=base_symbols
-    
-    #val1=sympy.diff(vectorfield[2],y)-sympy.diff(vectorfield[1],z)
-    #val2=sympy.diff(vectorfield[0],z)-sympy.diff(vectorfield[2],x)
-    #val3=sympy.diff(vectorfield[1],x)-sympy.diff(vectorfield[0],y)
-    
-    #return Vector(val1,val2,val3)
-
-
-def divergence():#vec,base_symbols=basic_xyz()):
+def divergence():
     """returns the sum of the components of the gradient vector"""
     raise NotImplemented
-    #gradv=gradient(vec,base_symbols)
-    #s=0
-    #for val in gradv:
-        #s+=val
         
-    #return s        
 
-def gradient():#expr,base_symbols=basic_xyz()):
+def gradient():
     """assumes all free symbols in the expression to be relevant variables.
     e.g. 
     (1,1,1) for f(x,y,z)=x+y+z
     (yz,xz,xy) for f(x,y,z)=x*y*z
     """
     raise NotImplemented
-    #n_exprs=[]
-    #for s in base_symbols:
-        #n_expr=sympy.diff(expr,s)
-        #n_exprs.append(n_expr)
-    #return Vector(*n_exprs)
-
+    
 class Matrix:
     """ 
     3x3 matrix, takes vectors as input    
@@ -113,7 +92,7 @@ class Matrix:
             return V
 
 
-    def form_Rotation(self,target,z):
+    def from_Rotation(self,target,z):
         """ takes two vectors, rotation axis is calculated as cross product
         then rotation is applied as acos of the dot product"""
         
@@ -123,15 +102,33 @@ class Matrix:
         
         return M
         
-   
+def RotationsMatrixFromVector(rot_vector):
+    """not entirely confident this is correct"""
+    
+    rotations=[]
+    if rot_vector[0]!=0:
+        xrot=RotationMatrix(rot_vector[0],(1,0,0))
+        rotations.append(xrot)
+        
+    if rot_vector[1]!=0:
+        yrot=RotationMatrix(rot_vector[1],(0,1,0))
+        rotations.append(yrot)
+        
+    if rot_vector[2]!=0:
+        zrot=RotationMatrix(rot_vector[2],(0,0,1))
+        rotations.append(zrot)
+        
+    return rotations
 
 def RotationMatrix(angle,rot_axis):
     """angle in radians"""
     c=math.cos(angle)
     s=math.sin(angle)
-    x=rot_axis.x
-    y=rot_axis.y
-    z=rot_axis.z
+    
+    x=rot_axis[0]
+    y=rot_axis[1]
+    z=rot_axis[2]
+    
     t=1-c
     v1=Vector(t*x**2+c  ,t*x*y+z*s,t*x*z-y*s)
     v2=Vector(t*x*y-z*s ,t*y**2+c,t*y*x+x*s)
@@ -150,12 +147,21 @@ class Vector:
         #duck type check
         1+x,1+y,1+z
         
-        
         self.x = x 
         self.y = y 
         self.z = z 
     
-      
+    
+    def __lt__(self,other):
+        if type(other)!=Vector:
+            raise TypeError
+        return self.magnitude()<other.magnitude()
+        
+    def __gt__(self,other):
+        if type(other)!=Vector:
+            raise TypeError
+        return self.magnitude()>other.magnitude()
+    
     def __len__(self):
         return 3
     
@@ -206,7 +212,7 @@ class Vector:
             v2=v2.normalize()
         except:
             print("vectors must be normalized, no methods give to support that")
-        #print(v1,v2)
+            
         ang=math.acos((v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2]))
         return ang
     
@@ -255,6 +261,11 @@ class Vector:
     def __truediv__(self,quotient):
         l=[i/quotient for i in self]        
         return Vector(*l)
+    
+    def __round__(self,index):
+        """round each entry"""
+        return Vector(round(self[0],index),round(self[1],index),round(self[2],index))
+        
     
     def __rmul__(self,other):
         return self*other
@@ -315,6 +326,17 @@ class Vector:
             vectors.append(v)
         m=Matrix(*vectors)
         return m
+    
+    def set_magnitude(self,l):
+        #ok so the issue is that magnitude is a derived property,
+        #so actually I'm shortening the vector so the result will
+        #be correct.
+        
+        v=self.copy()
+        v=v*(l/self.magnitude())
+        self.x=v.x
+        self.y=v.y
+        self.z=v.z
         
     def magnitude(self):
         v=self
@@ -326,7 +348,65 @@ class Vector:
         l=self.magnitude()
         return Vector(v[0]/l,v[1]/l,v[2]/l)
 
-
+def angle_v1v2(v1,v2):
+    """the angle between two vectors, in radians
     
+    """
+    
+    val=(v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2])
+    val=min(val,1)
+    
+        
+    ang=math.acos(val)
+    return ang
+    
+def get_radians_from_vector(x,y):
+    angle=0
+    if x>0:
+        angle=math.atan(y/x)
+    if x==0:
+        angle=math.atan(y/0.001)
+    if x<0:
+        angle=math.atan(y/x)+math.pi
+    if x>0 and y<=0:
+        angle=math.atan(y/x)+math.pi*2
+    if x==0 and y<=0:
+        angle=math.atan(y/0.001)+math.pi*2
+    return angle
 
-
+def vector_interpolation_step(start,goal,step_size=1.5):
+    goal=goal.copy()
+    goal=goal.normalize()
+    start=start.copy()
+    start=start.normalize()
+    
+    rads1=get_radians_from_vector(start[0],start[1])
+    rads2=get_radians_from_vector(goal[0],goal[1])
+    
+    #get difference between the vectors
+    rads_diff=rads2-rads1
+    
+    #make sure to interpolate the shorter path
+    if abs(rads_diff)>math.pi:
+        sign=(rads_diff/abs(rads_diff))
+        if sign>0:
+            rads_diff=(math.pi*2)-abs(rads_diff)
+            rads_diff=-rads_diff
+        else:
+            rads_diff=(math.pi*2)-abs(rads_diff)
+            
+    #if it's bigger than step, use the step
+    #also go the right way.
+    if abs(rads_diff)>step_size:
+        if rads_diff >0:
+            nrads_diff=step_size
+        else:
+            nrads_diff=-step_size
+    else:
+        nrads_diff=rads_diff
+    
+    #get the result.
+    M=RotationMatrix(nrads_diff,Vector(0,0,1))
+    result_vec=M*start
+        
+    return result_vec
