@@ -89,6 +89,7 @@ class Matrix:
                 i+=1
                 
             V=Vector(*new_values)
+            V=round(V,15)
             return V
 
 
@@ -234,7 +235,7 @@ class Vector:
     def cross(self,other):
         new_x=self.y*other.z-self.z*other.y
         new_y=self.z*other.x-self.x*other.z
-        new_z=self.x*other.y-self.y*self.x
+        new_z=self.x*other.y-self.y*other.x
         return Vector(new_x,new_y,new_z)
         
     def __repr__(self):
@@ -283,7 +284,24 @@ class Vector:
     
         
     def __sub__(self,v2):
-        return Vector(self[0]-v2[0],self[1]-v2[1],self[2]-v2[2])
+        
+        if type(v2)==Vector:
+            r=Vector(self[0]-v2[0],self[1]-v2[1],self[2]-v2[2])
+            r=round(r,10)
+            return r
+        else:
+            try:
+                v2=Vector(*v2)
+                r=Vector(self[0]-v2[0],self[1]-v2[1],self[2]-v2[2])
+                r=round(r,10)
+                return r
+            except:
+                raise TypeError
+        
+        
+                
+                
+            
     
     def __add__(self,v2):
         return Vector(self[0]+v2[0],self[1]+v2[1],self[2]+v2[2])

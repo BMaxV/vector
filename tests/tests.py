@@ -70,5 +70,10 @@ class TestGeom(unittest.TestCase):
             if abs(rads_diff)<stepsize:
                 break
         
+    def test_sub(self):
+        v1=vector.Vector(-1.5,0,0)
+        v2=vector.Vector(-0.5,0,0)
+        assert v2-v1 == vector.Vector(1,0,0)
+    
 if __name__=="__main__":
     unittest.main()
