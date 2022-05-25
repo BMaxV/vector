@@ -370,7 +370,8 @@ def angle_v1v2(v1,v2):
     """the angle between two vectors, in radians
     
     """
-    
+    v1=v1.normalize()
+    v2=v2.normalize()
     val=(v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2])
     val=min(val,1)
     
