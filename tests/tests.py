@@ -74,6 +74,35 @@ class TestGeom(unittest.TestCase):
         v1=vector.Vector(-1.5,0,0)
         v2=vector.Vector(-0.5,0,0)
         assert v2-v1 == vector.Vector(1,0,0)
+        
+        
+    def test_mirror_rotation(self):
+        #I want the result to be at...
+        #(0.9,0.9,0)
+        #I expect the result to be at
+        #(-0.1,-0.1,0)
+        point=vector.Vector(0.3,0.1,0)
+        
+        axis=vector.Vector(1,-1,0)
+        axis=axis.normalize()
+        angle=3.14156
+        print(axis)
+        M=vector.RotationMatrix(angle,axis)
+        print(M)
+        mid_point=vector.Vector(0.5,0.5,0)
+        shifted_point=point-mid_point
+        print("shifted point",shifted_point)
+        r=M*shifted_point
+        print("result",round(r,1))
+        
+        axis2=vector.Vector(0,0,1)
+        angle2=3.14156/2
+        M2=vector.RotationMatrix(angle2,axis2)
+        r2=M2*point
+        print(r2)
+        
     
 if __name__=="__main__":
-    unittest.main()
+    #unittest.main()
+    x=TestGeom()
+    x.test_mirror_rotation()

@@ -76,7 +76,7 @@ class Matrix:
             while i < 3:
                 s=0
                 while j < 3:
-                    
+                    #really? not j i, but i j and I missed this?
                     val1=self[j][i]
                     val2=other[j]
                     r=val1*val2
@@ -131,10 +131,13 @@ def RotationMatrix(angle,rot_axis):
     z=rot_axis[2]
     
     t=1-c
-    v1=Vector(t*x**2+c  ,t*x*y+z*s,t*x*z-y*s)
-    v2=Vector(t*x*y-z*s ,t*y**2+c,t*y*x+x*s)
-    v3=Vector(t*x*z+y*s ,t*y*z-x*s,t*z**2+c)
-    M=Matrix(v1,v2,v3)
+    
+    #oh yeah, straight copied this from wikipedia, just have to get it right.
+    v1=Vector(t*x**2+c  ,t*x*y+z*s, t*x*z-y*s)
+    v2=Vector(t*x*y-z*s ,t*y**2+c,  t*y*z+x*s)
+    v3=Vector(t*x*z+y*s ,t*y*z-x*s, t*z**2+c)
+    
+    M=Matrix(round(v1,6),round(v2,6),round(v3,6))
     return M
 
 class Vector:
