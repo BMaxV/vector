@@ -11,7 +11,15 @@ class TestGeom(unittest.TestCase):
             pass
         
         v=vector.Vector(1,1,0)
+    
+    def test_equal_tuple(self):
+        v=vector.Vector(1,0,1)
+        assert v == [1,0,1]
         
+    def test_equal_list(self):
+        v=vector.Vector(1,0,1)
+        assert v == (1,0,1)
+    
     def test_dot(self):
         v=vector.Vector(1,0,1)
         v2=vector.Vector(0,1,0)
@@ -27,6 +35,33 @@ class TestGeom(unittest.TestCase):
         v2=vector.Vector(1,1,0)
         r=v.dot(v2)
         assert r==2
+        
+        v=vector.Vector(0,1,0)
+        v2=vector.Vector(0,1,0)
+        r=v.dot(v2)
+        assert r==1
+        
+        v=vector.Vector(0,-1,0)
+        v2=vector.Vector(0,-1,0)
+        r=v.dot(v2)
+        assert r==1
+        
+        v = vector.Vector(1,1,0)
+        v = v.normalize()
+        v2 = vector.Vector(1,1,0)
+        v2 = v2.normalize()
+        r = round(v.dot(v2),3)
+        #print(r)
+        assert r==1
+        
+        v = vector.Vector(-1,-2,0)
+        v = v.normalize()
+        v2 = vector.Vector(-1,-2,0)
+        v2 = v2.normalize()
+        r = round(v.dot(v2),3)
+        #print(r)
+        assert r==1
+        
     
     def test_vector_interpolate(self):
         v1=vector.Vector(1,0,0)
@@ -86,23 +121,24 @@ class TestGeom(unittest.TestCase):
         axis=vector.Vector(1,-1,0)
         axis=axis.normalize()
         angle=3.14156
-        print(axis)
+        assert axis == (0.7071067811865475, -0.7071067811865475, 0.0)
+                
         M=vector.RotationMatrix(angle,axis)
-        print(M)
         mid_point=vector.Vector(0.5,0.5,0)
         shifted_point=point-mid_point
-        print("shifted point",shifted_point)
+        
+        assert shifted_point == (-0.2, -0.4, 0)
         r=M*shifted_point
-        print("result",round(r,1))
+        
+        r=round(r,2)
+        assert r == (0.4, 0.2, -0.0)
         
         axis2=vector.Vector(0,0,1)
         angle2=3.14156/2
         M2=vector.RotationMatrix(angle2,axis2)
         r2=M2*point
-        print(r2)
+        r2 = round(r2,3)
+        assert r2 == (-0.1, 0.3, 0.0)
         
-    
 if __name__=="__main__":
-    #unittest.main()
-    x=TestGeom()
-    x.test_mirror_rotation()
+    unittest.main()
