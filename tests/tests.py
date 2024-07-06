@@ -1,5 +1,6 @@
 from vector import vector
 
+import math
 import unittest
 
 class TestGeom(unittest.TestCase):
@@ -51,7 +52,7 @@ class TestGeom(unittest.TestCase):
         v2 = vector.Vector(1,1,0)
         v2 = v2.normalize()
         r = round(v.dot(v2),3)
-        #print(r)
+        
         assert r==1
         
         v = vector.Vector(-1,-2,0)
@@ -59,37 +60,43 @@ class TestGeom(unittest.TestCase):
         v2 = vector.Vector(-1,-2,0)
         v2 = v2.normalize()
         r = round(v.dot(v2),3)
-        #print(r)
-        assert r==1
         
+        assert r==1
     
+    def test_get_radians(self):
+        
+        c = 0
+        m = 20
+        while c < m:
+            value1 = round(math.pi*2*(c/m),4)
+            v1 = vector.Vector(math.cos(value1),math.sin(value1),0)
+            value2 = round(v1.get_absolute_radians(),4)
+            v2 = vector.Vector(math.cos(value2),math.sin(value2),0)
+            assert round(v1.x,3) == round(v2.x,3)
+            c += 1
+        
+        
     def test_vector_interpolate(self):
-        v1=vector.Vector(1,0,0)
-        v2=vector.Vector(0,1,0)
+        v1 = vector.Vector(1,0,0)
+        v2 = vector.Vector(0,1,0)
         
         stepsize=0.5
         while True:
-            v1=vector.vector_interpolation_step(v1,v2,stepsize)
-            rads_diff=vector.angle_v1v2(v1,v2)
-            if abs(rads_diff)<stepsize:
+            v1_values = vector.vector_interpolation_step(v1,v2,stepsize)
+            v1 = v1_values[0]
+            v1 = vector.Vector(*v1)
+            rads_diff = v1.angle_to_other(v2)
+            if abs(rads_diff) < stepsize:
                 break
         
-        v1=vector.Vector(1,0,0)
-        v2=vector.Vector(0,1,0)
+        v1 = vector.Vector(1,0,0)
+        v2 = vector.Vector(0,1,0)
         
         while True:
-            v1=vector.vector_interpolation_step(v1,v2,stepsize)
-            rads_diff=vector.angle_v1v2(v1,v2)
-            if abs(rads_diff)<stepsize:
-                break
-        
-        v1=vector.Vector(1,1,0)
-        v1=v1.normalize()
-        v2=vector.Vector(1,-1,0)
-        v2=v2.normalize()
-        while True:
-            v1=vector.vector_interpolation_step(v1,v2,stepsize)
-            rads_diff=vector.angle_v1v2(v1,v2)
+            v1_values = vector.vector_interpolation_step(v1,v2,stepsize)
+            v1 = v1_values[0]
+            v1 = vector.Vector(*v1)
+            rads_diff = v1.angle_to_other(v2)
             if abs(rads_diff)<stepsize:
                 break
         
@@ -97,10 +104,22 @@ class TestGeom(unittest.TestCase):
         v1=v1.normalize()
         v2=vector.Vector(1,-1,0)
         v2=v2.normalize()
+        while True:
+            v1_values = vector.vector_interpolation_step(v1,v2,stepsize)
+            v1 = v1_values[0]
+            rads_diff = v1.angle_to_other(v2)
+            if abs(rads_diff)<stepsize:
+                break
+        
+        v1=vector.Vector(1,1,0)
+        v1=v1.normalize()
+        v2=vector.Vector(1,-1,0)
+        v2=v2.normalize()
         
         while True:
-            v1=vector.vector_interpolation_step(v1,v2,stepsize)
-            rads_diff=vector.angle_v1v2(v1,v2)
+            v1_values = vector.vector_interpolation_step(v1,v2,stepsize)
+            v1 = v1_values[0]
+            rads_diff = v1.angle_to_other(v2)
             
             if abs(rads_diff)<stepsize:
                 break

@@ -180,8 +180,13 @@ class Vector:
             raise ValueError
     
     def __eq__(self,other):
-        if type(other)!=type(self):
+        
+        if type(other) in [tuple,list]:
+            #this should... take care of type problems.
+            pass
+        elif type(other)!=type(self):
             return False
+        
         if len(self)!=len(other):
             return False
         c=0
@@ -194,32 +199,39 @@ class Vector:
         return True
     
     def angle_to_other(self,other):
-        """the angle between two vectors
+        """
+        the angle between two vectors
         
         in radians
-        
         """
         if type(other)!=type(self):
-            raise TypeError
+            raise TypeError("inputs aren't both vectors.")
         
-
-        v1=self
-        v2=other
-        
-        m1=round(v1.magnitude(),3)
-        m2=round(v2.magnitude(),3)
-        
+        v1 = self
+        v2 = other
+                
         try:
-            v1=v1.copy()
-            v2=v2.copy()
-            v1=v1.normalize()
-            v2=v2.normalize()
+            v1 = v1.copy()
+            v2 = v2.copy()
+            v1 = v1.normalize()
+            v2 = v2.normalize()
         except:
             print("vectors must be normalized, no methods give to support that")
             
-        ang=math.acos((v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2]))
+        ang = math.acos((v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2]))
         return ang
     
+    def to_string(self):
+        s="("+",".join([str(self.x),str(self.y),str(self.z)])+")"
+        return s
+    
+    @classmethod
+    def from_string(self,s):
+        s=s.strip("(")
+        s=s.strip(")")
+        s=s.split(",")
+        tup=[float(x) for x in s]
+        return Vector(*tup)
     
     def subs(self,d=None):
         raise NotImplemented
@@ -287,27 +299,14 @@ class Vector:
     
         
     def __sub__(self,v2):
+        r=Vector(self[0]-v2[0],self[1]-v2[1],self[2]-v2[2])
+        r=round(r,10)
+        return r
         
-        if type(v2)==Vector:
-            r=Vector(self[0]-v2[0],self[1]-v2[1],self[2]-v2[2])
-            r=round(r,10)
-            return r
-        else:
-            try:
-                v2=Vector(*v2)
-                r=Vector(self[0]-v2[0],self[1]-v2[1],self[2]-v2[2])
-                r=round(r,10)
-                return r
-            except:
-                raise TypeError
-        
-        
-                
-                
-            
-    
     def __add__(self,v2):
-        return Vector(self[0]+v2[0],self[1]+v2[1],self[2]+v2[2])
+        v=Vector(self[0]+v2[0],self[1]+v2[1],self[2]+v2[2])
+        v=round(v,10)
+        return v
     
     def dot(self,v2):
         v1=self
@@ -360,15 +359,21 @@ class Vector:
         self.z=v.z
         
     def magnitude(self):
-        v=self
-        l=(v[0]**2+v[1]**2+v[2]**2)**0.5
+        v = self
+        l = (v[0]**2+v[1]**2+v[2]**2)**0.5
         return l
-
+    
     def normalize(self):
-        v=self
-        l=self.magnitude()
+        v = self
+        l = self.magnitude()
+        if l == 0:
+            return Vector(0,0,0)
         return Vector(v[0]/l,v[1]/l,v[2]/l)
-
+    
+    def get_absolute_radians(self):
+        value = get_radians_from_vector(self.x,self.y)
+        return value
+    
 def angle_v1v2(v1,v2):
     """the angle between two vectors, in radians
     
@@ -431,4 +436,4 @@ def vector_interpolation_step(start,goal,step_size=1.5):
     M=RotationMatrix(nrads_diff,Vector(0,0,1))
     result_vec=M*start
         
-    return result_vec
+    return result_vec, rads_diff
