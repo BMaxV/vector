@@ -402,38 +402,38 @@ def get_radians_from_vector(x,y):
     return angle
 
 def vector_interpolation_step(start,goal,step_size=1.5):
-    goal=goal.copy()
-    goal=goal.normalize()
-    start=start.copy()
-    start=start.normalize()
+    goal = goal.copy()
+    goal = goal.normalize()
+    start = start.copy()
+    start = start.normalize()
     
-    rads1=get_radians_from_vector(start[0],start[1])
-    rads2=get_radians_from_vector(goal[0],goal[1])
+    rads1 = get_radians_from_vector(start[0],start[1])
+    rads2 = get_radians_from_vector(goal[0],goal[1])
     
-    #get difference between the vectors
-    rads_diff=rads2-rads1
-    
-    #make sure to interpolate the shorter path
-    if abs(rads_diff)>math.pi:
-        sign=(rads_diff/abs(rads_diff))
-        if sign>0:
-            rads_diff=(math.pi*2)-abs(rads_diff)
-            rads_diff=-rads_diff
+    # get difference between the vectors
+    rads_diff = rads2-rads1
+    #print(rads_diff)
+    # make sure to interpolate the shorter path
+    if abs(rads_diff) > math.pi:
+        sign = (rads_diff/abs(rads_diff))
+        if sign > 0:
+            rads_diff = (math.pi*2)-abs(rads_diff)
+            rads_diff = -rads_diff
         else:
-            rads_diff=(math.pi*2)-abs(rads_diff)
+            rads_diff = (math.pi*2)-abs(rads_diff)
             
     #if it's bigger than step, use the step
     #also go the right way.
-    if abs(rads_diff)>step_size:
-        if rads_diff >0:
-            nrads_diff=step_size
+    if abs(rads_diff) > step_size:
+        if rads_diff > 0:
+            nrads_diff = step_size
         else:
-            nrads_diff=-step_size
+            nrads_diff = -step_size
     else:
-        nrads_diff=rads_diff
+        nrads_diff = rads_diff
     
-    #get the result.
-    M=RotationMatrix(nrads_diff,Vector(0,0,1))
-    result_vec=M*start
+    # get the result.
+    M = RotationMatrix(nrads_diff,Vector(0,0,1))
+    result_vec = M*start
         
     return result_vec, rads_diff
