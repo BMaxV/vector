@@ -88,6 +88,59 @@ class TestGeom(unittest.TestCase):
         # >>> 
         raise ValueError
 
+    def test_angle_to_other(self):
+        
+        v1 = vector.Vector(1, 0, 0)
+        v2 = vector.Vector(0, 1, 0)
+        rads_diff = v1.angle_to_other(v2)
+        assert rads_diff == math.pi/2
+        
+        v1 = vector.Vector(-1, 0, 0)
+        v2 = vector.Vector(0, 1, 0)
+        rads_diff = v1.angle_to_other(v2)
+        assert rads_diff == math.pi/2
+        
+        v1 = vector.Vector(-1, 0, 0)
+        v2 = vector.Vector(0, -1, 0)
+        rads_diff = v1.angle_to_other(v2)
+        assert rads_diff == math.pi/2
+        
+        v1 = vector.Vector(1, 0, 0)
+        v2 = vector.Vector(0, -1, 0)
+        rads_diff = v1.angle_to_other(v2)
+        assert rads_diff == math.pi/2
+        
+        v1 = vector.Vector(-1, 1, 0)
+        v2 = vector.Vector(1, 1, 0)
+        rads_diff = v1.angle_to_other(v2)
+        assert rads_diff == math.pi/2
+        
+        v1 = vector.Vector(-1, -1, 0)
+        v2 = vector.Vector(1, -1, 0)
+        rads_diff = v1.angle_to_other(v2)
+        assert rads_diff == math.pi/2
+        
+        v1 = vector.Vector(1, 1, 0)
+        v2 = vector.Vector(1, -1, 0)
+        rads_diff = v1.angle_to_other(v2)
+        assert rads_diff == math.pi/2
+        
+        v1 = vector.Vector(1, -1, 0)
+        v2 = vector.Vector(1, 1, 0)
+        rads_diff = v1.angle_to_other(v2)
+        assert rads_diff == math.pi/2
+        
+        v1 = vector.Vector(1, 0, 0)
+        v2 = vector.Vector(-1, 1, 0)
+        rads_diff = v1.angle_to_other(v2)
+        assert rads_diff == math.pi * 3/4
+        
+        v1 = vector.Vector(1, 0, 0)
+        v2 = vector.Vector(-1, -1, 0)
+        rads_diff = v1.angle_to_other(v2)
+        assert rads_diff == math.pi * 3/4
+        
+        
     def test_vector_interpolate(self):
         
         v1 = vector.Vector(1, 0, 0)
