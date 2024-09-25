@@ -63,6 +63,30 @@ class TestGeom(unittest.TestCase):
         
         assert r==1
     
+    def test_faked_3d_point_inside(self):
+        l = [(0,0,1),(1,0,1),(1,1,1),(0,1,1)]
+        l = [vector.Vector(*x) for x in l]
+        vertlist = l
+        point = vector.Vector(0.5,0.5,0.5)
+        r = vector.get_faked_3d_point_inside(vertlist,point)
+        assert r
+        
+        point = vector.Vector(0.5,0.4,0)
+        r = vector.get_faked_3d_point_inside(vertlist,point)
+        assert r
+        
+        point = vector.Vector(0.4,0.5,-0.5)
+        r = vector.get_faked_3d_point_inside(vertlist,point)
+        assert r
+        
+        point = vector.Vector(1,0.5,0.5)
+        r = vector.get_faked_3d_point_inside(vertlist,point)
+        assert not r
+        
+        point = vector.Vector(1.5,0.5,0.5)
+        r = vector.get_faked_3d_point_inside(vertlist,point)
+        assert not r
+    
     def test_get_radians(self):
         
         c = 0
@@ -140,6 +164,47 @@ class TestGeom(unittest.TestCase):
         rads_diff = v1.angle_to_other(v2)
         assert rads_diff == math.pi * 3/4
         
+        
+        v1 = vector.Vector(1, 0, 0)
+        v2 = vector.Vector(1, 0, 0)
+        rads_diff = v1.angle_to_other(v2)
+        assert rads_diff == 0
+        
+        # no idea
+        v1 = vector.Vector(1, 0, 0)
+        v2 = vector.Vector(0, 0, 0)
+        try:
+            rads_diff = v1.angle_to_other(v2)
+        except ValueError:
+            a=1
+        
+        v1 = vector.Vector(0, 0, 0)
+        v2 = vector.Vector(1, 0, 0)
+        try:
+            rads_diff = v1.angle_to_other(v2)
+        except ValueError:
+            a=1
+        
+        v1 = vector.Vector(0, 0, 0)
+        v2 = vector.Vector(0, 0, 0)
+        try:
+            rads_diff = v1.angle_to_other(v2)
+        except ValueError:
+            a=1
+        
+        v1 = vector.Vector(5, 0, 0)
+        v2 = vector.Vector(5, 0, 0)
+        rads_diff = v1.angle_to_other(v2)
+        assert rads_diff == 0
+        
+        # this caused a math domain error in practice
+        # because of floating points. so, let's keep the data around
+        # for testing, this should just work, otherwise there is
+        # a math error.
+        v1 = vector.Vector(-2.512296313, 55.274074381, 0) 
+        v2 = vector.Vector(-0.2512296313, 5.5274074381, 0)
+        
+        rads_diff = v1.angle_to_other(v2)
         
     def test_vector_interpolate(self):
         

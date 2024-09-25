@@ -69,7 +69,7 @@ class Matrix:
                 new_vs.append(rv)
             M=Matrix(*new_vs)
             return M
-        if isinstance(other,Vector):
+        elif isinstance(other,Vector):
             i=0
             j=0
             new_values=[]
@@ -92,7 +92,14 @@ class Matrix:
             V=round(V,15)
             return V
 
-
+        else:
+            try:
+                other2 = Vector(*other)
+                r = self*other2
+                return r
+            except:
+                raise TypeError("not a compatible object/type?"+str(type(other)))
+                
     def from_Rotation(self,target,z):
         """ takes two vectors, rotation axis is calculated as cross product
         then rotation is applied as acos of the dot product"""
@@ -102,7 +109,44 @@ class Matrix:
         M=self.Rotation(angle,None,rot_axis)
         
         return M
+
+def get_faked_3d_point_inside(vertlist,point):
+    """this is not entirely accurate,
+    I'm interpreting the vert list as defining a prism,
+    I'm assuming all points are coplanar and sorted.
+    I take the edge normal and check whether the vector from
+    an edge point to "point" is less than 0
+    
+    if that's consistent for all edges, the point is inside.
+    """
+    c = -1
+    m = len(vertlist)
+    vx1 = vertlist[0]
+    vx2 = vertlist[1]
+    vx3 = vertlist[2]
+     
+    vv1= vx2-vx1
+    vv2 = vx3-vx2
+    norm = vv1.cross(vv2)
+    norm = norm.normalize()
+    rm = RotationMatrix(math.pi/2, norm)
+    all_lower = True
+    while c < m-1:
         
+        v1 = vertlist[c]
+        v2 = vertlist[c+1]
+        vec = (v2-v1)
+        edge_normal = rm * vec # this might have to turn the other way.
+        dot_val = (v1-point).dot(edge_normal)
+        
+        if dot_val  >= 0:
+            all_lower =False
+            break
+        c+=1
+    
+    inside = all_lower
+    return inside
+    
 def RotationsMatrixFromVector(rot_vector):
     """not entirely confident this is correct"""
     
@@ -170,11 +214,11 @@ class Vector:
         return 3
     
     def __getitem__(self,ind):
-        if ind==0:
+        if ind == 0:
             return self.x
-        elif ind==1:
+        elif ind == 1:
             return self.y
-        elif ind==2:
+        elif ind == 2:
             return self.z
         else:
             raise ValueError
@@ -209,7 +253,13 @@ class Vector:
         
         v1 = self
         v2 = other
-                
+        
+        if v1.magnitude() == 0:
+           raise ValueError("this vector has no length") 
+        if v2.magnitude() == 0:
+            raise ValueError("the other vector has no length")
+            
+        
         try:
             v1 = v1.copy()
             v2 = v2.copy()
@@ -217,12 +267,17 @@ class Vector:
             v2 = v2.normalize()
         except:
             print("vectors must be normalized, no methods give to support that")
-            
-        ang = math.acos((v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2]))
+        
+        # floating point nonsense.
+        value = (v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2])
+        if not (-1 <= value <= 1):
+            value = round(value,8) 
+        ang = math.acos(value)
+        
         return ang
     
     def to_string(self):
-        s="("+",".join([str(self.x),str(self.y),str(self.z)])+")"
+        s = "("+",".join([str(self.x),str(self.y),str(self.z)])+")"
         return s
     
     @classmethod
@@ -304,8 +359,8 @@ class Vector:
         return r
         
     def __add__(self,v2):
-        v=Vector(self[0]+v2[0],self[1]+v2[1],self[2]+v2[2])
-        v=round(v,10)
+        v = Vector(self[0]+v2[0],self[1]+v2[1],self[2]+v2[2])
+        v = round(v,10)
         return v
     
     def dot(self,v2):
