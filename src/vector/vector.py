@@ -132,6 +132,7 @@ def get_edge_normals(vertlist):
         v2 = vertlist[c+1]
         vec = (v1-v2)
         edge_normal = rm * vec # this might have to turn the other way.
+        edge_normal = edge_normal.normalize()
         edge_normals.append(edge_normal)
         c += 1
     this = edge_normals.pop(0)

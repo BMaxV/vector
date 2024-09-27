@@ -63,6 +63,16 @@ class TestGeom(unittest.TestCase):
         
         assert r == 1
     
+    def test_normals_are_normalized(self):
+        
+        l = [(0,0,1),(1,0,1),(1,3,1),(0,3,1)]
+        l = [vector.Vector(*x) for x in l]
+        
+        norms = vector.get_edge_normals(l)
+        
+        for x in norms:
+            assert x.magnitude() == 1
+    
     def test_get_edge_normals(self):
         
         l = [(0,0,1),(1,0,1),(1,1,1),(0,1,1)]
