@@ -110,15 +110,10 @@ class Matrix:
         
         return M
 
-def get_faked_3d_point_inside(vertlist,point):
-    """this is not entirely accurate,
-    I'm interpreting the vert list as defining a prism,
-    I'm assuming all points are coplanar and sorted.
-    I take the edge normal and check whether the vector from
-    an edge point to "point" is less than 0
-    
-    if that's consistent for all edges, the point is inside.
+def get_edge_normals(vertlist):
     """
+    """
+    edge_normals = []
     c = -1
     m = len(vertlist)
     vx1 = vertlist[0]
@@ -130,20 +125,45 @@ def get_faked_3d_point_inside(vertlist,point):
     norm = vv1.cross(vv2)
     norm = norm.normalize()
     rm = RotationMatrix(math.pi/2, norm)
+    
     all_lower = True
     while c < m-1:
-        
         v1 = vertlist[c]
         v2 = vertlist[c+1]
-        vec = (v2-v1)
+        vec = (v1-v2)
         edge_normal = rm * vec # this might have to turn the other way.
-        dot_val = (v1-point).dot(edge_normal)
+        edge_normals.append(edge_normal)
+        c += 1
+    this = edge_normals.pop(0)
+    edge_normals.append(this)
         
+    return edge_normals
+
+def get_faked_3d_point_inside(vertlist,point):
+    """this is not entirely accurate,
+    I'm interpreting the vert list as defining a prism,
+    I'm assuming all points are coplanar and sorted.
+    I take the edge normal and check whether the vector from
+    an edge point to "point" is less than 0
+    
+    if that's consistent for all edges, the point is inside.
+    """
+    
+    normals = get_edge_normals(vertlist)
+    all_lower = True
+    
+    c = -1
+    m = len(vertlist)
+    
+    while c < m:
+        edge_normal = normals[c]
+        v1 = vertlist[c]
+        dot_val = (point-v1).dot(edge_normal)
         if dot_val  >= 0:
             all_lower =False
             break
-        c+=1
-    
+        c += 1
+        
     inside = all_lower
     return inside
     

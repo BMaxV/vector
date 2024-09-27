@@ -61,7 +61,57 @@ class TestGeom(unittest.TestCase):
         v2 = v2.normalize()
         r = round(v.dot(v2),3)
         
-        assert r==1
+        assert r == 1
+    
+    def test_get_edge_normals(self):
+        
+        l = [(0,0,1),(1,0,1),(1,1,1),(0,1,1)]
+        l = [vector.Vector(*x) for x in l]
+        
+        norms = vector.get_edge_normals(l)
+        
+        comp = [(0.0, -1.0, 0.0),
+        (1.0, 0.0, 0.0),
+        (0.0, 1.0, 0.0),
+        (-1.0, 0.0, 0.0),]
+        
+        c = 0
+        m = len(l)
+        while c < m:
+            n = norms[c]
+            compn= comp[c]
+            assert n == compn
+            c += 1
+    def test_get_edge_normals_rot(self):
+        
+        axis = vector.Vector(1,0,0)
+        axis = axis.normalize()
+        angle = math.pi/2
+        RM = vector.RotationMatrix(angle,axis)
+        
+        l = [(0,0,1),(1,0,1),(1,1,1),(0,1,1)]
+        l = [RM * vector.Vector(*x) for x in l]
+        
+        norms = vector.get_edge_normals(l)
+        
+        comp = [(0.0, 0.0, -1.0),
+        (1.0, 0.0, 0.0),
+        (0.0, 0.0, 1.0),
+        (-1.0, 0.0, 0.0),
+            ]
+        
+        
+        c = 0
+        m = len(l)
+        while c < m:
+            n = norms[c]
+            compn = comp[c]
+            assert n == compn
+            c += 1
+       
+        
+        
+
     
     def test_faked_3d_point_inside(self):
         l = [(0,0,1),(1,0,1),(1,1,1),(0,1,1)]
