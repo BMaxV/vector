@@ -110,6 +110,44 @@ class Matrix:
         
         return M
 
+def get_rotation_data(from_v,to_v):
+    """
+    assuming that p2 is "up" this returns the matrix, angle and axis
+    for rotating towards that state.
+    
+    returns a matrix, angle and axis,
+
+    to revert the rotation from the matrix, make a new
+    one with (-ang, axis)
+    """
+        
+    from_v = from_v.normalize()
+    to_v = to_v.normalize()
+    
+    rot_axis = from_v.cross(to_v)
+    rot_axis = rot_axis.normalize()
+    # give me the angle.
+    angle = vector.angle_v1v2(from_v,to_v)
+    
+    # these are the matrices I will rotate everything with later.
+    RMx = vector.RotationMatrix(angle,rot_axis)
+    
+    return RMx, angle, rot_axis
+
+def get_face_normal(vertlist):
+    """assuming the face is coplanar"""
+    
+    vx1 = vertlist[0]
+    vx2 = vertlist[1]
+    vx3 = vertlist[2]
+     
+    vv1= vx2-vx1
+    vv2 = vx3-vx2
+    norm = vv1.cross(vv2)
+    norm = norm.normalize()
+    
+    return norm
+    
 def get_edge_normals(vertlist):
     """
     """

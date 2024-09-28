@@ -21,6 +21,26 @@ class TestGeom(unittest.TestCase):
         v=vector.Vector(1,0,1)
         assert v == (1,0,1)
     
+    def test_get_face_normal(self):
+        l = [(0,0,1),(1,0,0),(1,1,0),(0,1,1)]
+        vertlist = [vector.Vector(*x) for x in l]
+        norm = vector.get_face_normal(vertlist)
+        
+        assert norm == vector.Vector(1,0,1).normalize()
+        
+    def test_get_rotation_data(self):
+        l = [(0,0,1),(1,0,0),(1,1,0),(0,1,1)]
+        vertlist = [vector.Vector(*x) for x in l]
+        
+        norm = get_face_normal(vertlist)
+        
+        RMx, angle, axis = vector.get_rotation_data(norm, vector.Vector(0,0,1))
+        
+        new_vert_list = [RMx*x for x in vertlist]
+        new_norm = vector.get_face_normal(new_vert_list)
+        
+        assert new_norm == vector.Vector(0,0,1)
+        
     def test_dot(self):
         v=vector.Vector(1,0,1)
         v2=vector.Vector(0,1,0)
