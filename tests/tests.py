@@ -32,7 +32,7 @@ class TestGeom(unittest.TestCase):
         l = [(0,0,1),(1,0,0),(1,1,0),(0,1,1)]
         vertlist = [vector.Vector(*x) for x in l]
         
-        norm = get_face_normal(vertlist)
+        norm = vector.get_face_normal(vertlist)
         
         RMx, angle, axis = vector.get_rotation_data(norm, vector.Vector(0,0,1))
         

@@ -127,10 +127,10 @@ def get_rotation_data(from_v,to_v):
     rot_axis = from_v.cross(to_v)
     rot_axis = rot_axis.normalize()
     # give me the angle.
-    angle = vector.angle_v1v2(from_v,to_v)
+    angle = angle_v1v2(from_v,to_v)
     
     # these are the matrices I will rotate everything with later.
-    RMx = vector.RotationMatrix(angle,rot_axis)
+    RMx = RotationMatrix(angle,rot_axis)
     
     return RMx, angle, rot_axis
 
