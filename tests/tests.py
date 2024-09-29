@@ -28,6 +28,14 @@ class TestGeom(unittest.TestCase):
         
         assert norm == vector.Vector(1,0,1).normalize()
         
+        l = [(1,0,0),(3,0,0),(2,0,0)] # these are colinear
+        vertlist = [vector.Vector(*x) for x in l]
+        try:
+            norm = vector.get_face_normal(vertlist)
+            raise ValueError("This should have caused an error")
+        except ValueError:
+            pass
+    
     def test_get_rotation_data(self):
         l = [(0,0,1),(1,0,0),(1,1,0),(0,1,1)]
         vertlist = [vector.Vector(*x) for x in l]

@@ -139,10 +139,23 @@ def get_face_normal(vertlist):
     
     vx1 = vertlist[0]
     vx2 = vertlist[1]
-    vx3 = vertlist[2]
-     
-    vv1= vx2-vx1
-    vv2 = vx3-vx2
+    vv1 = vx2-vx1
+    vv1 = vv1.normalize()
+    c = 1
+    m = len(vertlist)
+    found = False
+    while c < m-2:
+        vx2 = vertlist[c]
+        vx3 = vertlist[c+1]
+        vv2 = vx3-vx2
+        vv2 = vv2.normalize()
+        if vv1.dot(vv2)!=1:
+            found = True
+            break
+        c += 1
+    if found == False:
+        raise ValueError("all verts of this vertlist are colinear, this isn't a face, it's a line")
+    
     norm = vv1.cross(vv2)
     norm = norm.normalize()
     
