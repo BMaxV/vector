@@ -137,46 +137,59 @@ def get_rotation_data(from_v,to_v):
 def get_face_normal(vertlist):
     """assuming the face is coplanar"""
     
+    center = Vector(0,0,0)
+    for x in vertlist:
+        center += x
+    center = center / len(vertlist)
+    
     vx1 = vertlist[0]
-    vx2 = vertlist[1]
-    vv1 = vx2-vx1
+    vv1 = center - vx1
     vv1 = vv1.normalize()
+    
     c = 1
     m = len(vertlist)
-    found = False
-    while c < m-2:
+    norms = []
+    while c < m:
         vx2 = vertlist[c]
-        vx3 = vertlist[c+1]
-        vv2 = vx3-vx2
+        vv2 = center - vx2
         vv2 = vv2.normalize()
-        if vv1.dot(vv2)!=1:
-            found = True
-            break
+        
+        norm = vv1.cross(vv2)
+        norm = norm.normalize()
+        norms.append(norm)
+        #if norm.magnitude() == 1:
+            #break
         c += 1
-    if found == False:
-        raise ValueError("all verts of this vertlist are colinear, this isn't a face, it's a line")
     
-    norm = vv1.cross(vv2)
-    norm = norm.normalize()
+    real_norm = Vector(0,0,0)
+    for t_norm in norms:
+        real_norm += t_norm
+    real_norm = real_norm / len(norms)
     
+    assert norm.magnitude() != 0
+    #print(norm)
+    #print(vv1,vv2)
+    
+    # try:
+        # for x in vertlist:
+            # val = norm.dot(x)
+            # assert val == 0
+            
+    # except AssertionError:
+        # raise ValueError("dot product isn't 0, vertlist is not coplanar.")
+        
     return norm
     
 def get_edge_normals(vertlist):
     """
     """
+    
+    norm = get_face_normal(vertlist)
+    rm = RotationMatrix(math.pi/2, norm)
+    
     edge_normals = []
     c = -1
     m = len(vertlist)
-    vx1 = vertlist[0]
-    vx2 = vertlist[1]
-    vx3 = vertlist[2]
-     
-    vv1= vx2-vx1
-    vv2 = vx3-vx2
-    norm = vv1.cross(vv2)
-    norm = norm.normalize()
-    rm = RotationMatrix(math.pi/2, norm)
-    
     all_lower = True
     while c < m-1:
         v1 = vertlist[c]
@@ -203,21 +216,31 @@ def get_faked_3d_point_inside(vertlist,point):
     
     normals = get_edge_normals(vertlist)
     all_lower = True
-    
+    all_higher = True
     c = -1
     m = len(vertlist)
     
     while c < m:
+        
         edge_normal = normals[c]
         v1 = vertlist[c]
-        dot_val = (point-v1).dot(edge_normal)
-        if dot_val  >= 0:
-            all_lower =False
-            break
-        c += 1
+        vec = (point-v1)
+        dot_val = vec.dot(edge_normal)
+        if dot_val > 0:
+            all_lower = False
+        if dot_val < 0:
+            all_higher = False
         
-    inside = all_lower
-    return inside
+        c += 1
+    if all_higher and all_lower:
+        return False # error
+    elif all_higher and not all_lower:
+        return True
+    elif all_lower and not all_higher:
+        return True
+    else:
+        # regular case where it's outside
+        return False 
     
 def RotationsMatrixFromVector(rot_vector):
     """not entirely confident this is correct"""

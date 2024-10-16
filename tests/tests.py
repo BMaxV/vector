@@ -26,7 +26,12 @@ class TestGeom(unittest.TestCase):
         vertlist = [vector.Vector(*x) for x in l]
         norm = vector.get_face_normal(vertlist)
         
-        assert norm == vector.Vector(1,0,1).normalize()
+        f=vector.Vector(1,0,1).normalize()
+        norm=round(norm,8)
+        f=round(f,8)
+        #print(f)
+        #print(norm)
+        assert norm == f
         
         l = [(1,0,0),(3,0,0),(2,0,0)] # these are colinear
         vertlist = [vector.Vector(*x) for x in l]
@@ -35,6 +40,20 @@ class TestGeom(unittest.TestCase):
             raise ValueError("This should have caused an error")
         except ValueError:
             pass
+        
+        
+        l = [[0.02997, 0.49584, 0.0], [-0.01055, 0.50394, 0.0], [-0.00341, 0.45766, 0.0]]
+        vertlist = [vector.Vector(*x) for x in l]
+        norm = vector.get_face_normal(vertlist)
+        
+        print(norm)
+        assert norm == vector.Vector(0,0,1)
+        
+        l = [[0.99975, -0.02178, 0.00492], [0.99975, -0.02133, 0.00636], [0.99975, -0.02133, 0.00636], [0.99971, -0.02312, 0.00681], [0.9997, -0.02364, 0.00615], [0.99973, -0.02271, 0.00489]]
+        vertlist = [vector.Vector(*x) for x in l]
+        norm = vector.get_face_normal(vertlist)
+        print(norm)
+        assert norm == vector.Vector(0,0,1)
     
     def test_get_rotation_data(self):
         l = [(0,0,1),(1,0,0),(1,1,0),(0,1,1)]
@@ -100,6 +119,7 @@ class TestGeom(unittest.TestCase):
         
         for x in norms:
             assert x.magnitude() == 1
+    
     
     def test_get_edge_normals(self):
         
