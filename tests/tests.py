@@ -5,6 +5,29 @@ import unittest
 
 class TestGeom(unittest.TestCase):
     
+    def test_matrix_matrix_mul(self):
+        up = vector.Vector(0,0,1)
+        x = vector.Vector(1,0,0)
+        
+        
+        test = vector.Vector(*x)
+        
+        m1 = vector.RotationMatrix(math.pi/2,up)
+        m2 = vector.RotationMatrix(math.pi/2,x)
+                
+        assert m1 * x == vector.Vector(0,1,0)
+        assert m2 * x == x
+        assert (m2 * (m1*x)) == up
+        
+        test1 = m1*x
+        test2 = m2 * test1
+        
+        m_special = m2*m1
+        
+        test3 = m_special * x 
+        
+        assert test2 == test3
+        
     def test_vector(self):
         try:
             v=vector.Vector(*"abc")
@@ -464,6 +487,9 @@ def make_interpolation_picture(vectors, filenameaddition):
     fn = f"interptest{filenameaddition}.svg"
     geom.main_svg(fl,fn, view_box_d=my_view_box_d)
 
+def single():
+    MyTest=TestGeom()
+    MyTest.test_matrix_matrix_mul()
 
 if __name__=="__main__":
-    unittest.main()
+    single()

@@ -62,14 +62,18 @@ class Matrix:
         return s
     
     def __mul__(self,other):
+        
         if isinstance(other,Matrix):
-            new_vs=[]
-            for v in other:
-                rv=self*v
-                new_vs.append(rv)
-            M=Matrix(*new_vs)
+            
+            v1 = self * other.v1
+            v2 = self * other.v2
+            v3 = self * other.v3
+            new_vs = [v1,v2,v3]
+            M = Matrix(*new_vs)
             return M
+            
         elif isinstance(other,Vector):
+        
             i=0
             j=0
             new_values=[]
