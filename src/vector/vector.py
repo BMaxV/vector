@@ -122,6 +122,16 @@ class Matrix:
         
         return M
 
+def get_normal_tangent_for_sphere_point(point):
+    normal = point.normalize()
+    
+    up = Vector(0,0,1)
+    
+    default_tangent = point.cross(up)
+    default_tangent = default_tangent.normalize()
+    
+    
+    return normal, default_tangent
 
 def get_sphere_point_local_vector_matrices(sphere_point,local_rotation,base_vector=(0,1,0)):
     """
@@ -131,29 +141,29 @@ def get_sphere_point_local_vector_matrices(sphere_point,local_rotation,base_vect
     e.g.  a local movement vector with an indicator or vector object that is being created in the default orientation.
     
     """
-    up = vector.Vector(0,0,1)
+    up = Vector(0,0,1)
     
     point_normal, org_tangent = get_normal_tangent_for_sphere_point(sphere_point)
     
     # this tagent, even if I rotate it up, has some amount of rotation applied to it.
     # because it's orthogonal to both up and my position point.
     
-    matrix, angle, axis  = vector.get_rotation_data(sphere_point, up)
-    up_rot_matrix = vector.RotationMatrix(angle, axis)
+    matrix, angle, axis  = get_rotation_data(sphere_point, up)
+    up_rot_matrix = RotationMatrix(angle, axis)
     
-    base_indicator_vector = vector.Vector(*base_vector)
+    base_indicator_vector = Vector(*base_vector)
     tangent_2d = up_rot_matrix * org_tangent
     
     # this is the angle difference between my default orientation
     # and the angle of my sphere point vector that is due to 
     # the sphere point not being on the 0 meridian.
     
-    offset_angle = vector.angle_v1v2(base_indicator_vector,tangent_2d)
+    offset_angle = angle_v1v2(base_indicator_vector,tangent_2d)
     
     # can only detect the angle magnitude but not the direction
     # directly, so I have try and find which one makes sense.
-    flat_rot_1 = vector.RotationMatrix(offset_angle, up)
-    flat_rot_2 = vector.RotationMatrix(-offset_angle, up)
+    flat_rot_1 = RotationMatrix(offset_angle, up)
+    flat_rot_2 = RotationMatrix(-offset_angle, up)
     if round((flat_rot_1*base_indicator_vector).dot(tangent_2d),4)==1:
         
         offset = flat_rot_1
@@ -162,9 +172,9 @@ def get_sphere_point_local_vector_matrices(sphere_point,local_rotation,base_vect
         assert this == 1
         offset = flat_rot_2
     
-    flat_rot = vector.RotationMatrix(local_rotation, up)
+    flat_rot = RotationMatrix(local_rotation, up)
     
-    down_rot_matrix= vector.RotationMatrix(-angle, axis)
+    down_rot_matrix = RotationMatrix(-angle, axis)
     
     # THIS is for my indicator, which starts at some rotation up top.
     # like, my default points to +x or +y or something.
