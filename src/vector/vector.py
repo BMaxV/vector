@@ -68,32 +68,40 @@ class Matrix:
             v1 = self * other.v1
             v2 = self * other.v2
             v3 = self * other.v3
+            
+            #v1 = self * Vector(other.v1.x,other.v2.x,other.v3.x)
+            #v2 = self * Vector(other.v1.y,other.v2.y,other.v3.y)
+            #v3 = self * Vector(other.v1.z,other.v2.z,other.v3.z)
+            
             new_vs = [v1,v2,v3]
             M = Matrix(*new_vs)
+            
             return M
             
         elif isinstance(other,Vector):
         
-            i=0
-            j=0
-            new_values=[]
+            i = 0
+            j = 0
+            new_values = []
             while i < 3:
-                s=0
+                s = 0
                 while j < 3:
-                    #really? not j i, but i j and I missed this?
-                    val1=self[j][i]
-                    val2=other[j]
-                    r=val1*val2
-                    s+=r
-                    j+=1
+                    # really? not j i, but i j and I missed this?
+                    val1 = self[j][i]
+                    val2 = other[j]
+                    r = val1*val2
+                    
+                    #print(val1,val2,r)
+                    s += r
+                    j += 1
                 
                 new_values.append(s)
                 
-                j=0
-                i+=1
+                j = 0
+                i += 1
                 
-            V=Vector(*new_values)
-            V=round(V,15)
+            V = Vector(*new_values)
+            V = round(V,15)
             return V
 
         else:
@@ -113,6 +121,61 @@ class Matrix:
         M=self.Rotation(angle,None,rot_axis)
         
         return M
+
+
+def get_sphere_point_local_vector_matrices(sphere_point,local_rotation,base_vector=(0,1,0)):
+    """
+    returns two matrices, one rotates a point from a "default" orientation into a sphere position with the local rotation applied.
+    the other rotates from the sphere point to the default orientation, applies the local rotation and rotates back
+    
+    e.g.  a local movement vector with an indicator or vector object that is being created in the default orientation.
+    
+    """
+    up = vector.Vector(0,0,1)
+    
+    point_normal, org_tangent = get_normal_tangent_for_sphere_point(sphere_point)
+    
+    # this tagent, even if I rotate it up, has some amount of rotation applied to it.
+    # because it's orthogonal to both up and my position point.
+    
+    matrix, angle, axis  = vector.get_rotation_data(sphere_point, up)
+    up_rot_matrix = vector.RotationMatrix(angle, axis)
+    
+    base_indicator_vector = vector.Vector(*base_vector)
+    tangent_2d = up_rot_matrix * org_tangent
+    
+    # this is the angle difference between my default orientation
+    # and the angle of my sphere point vector that is due to 
+    # the sphere point not being on the 0 meridian.
+    
+    offset_angle = vector.angle_v1v2(base_indicator_vector,tangent_2d)
+    
+    # can only detect the angle magnitude but not the direction
+    # directly, so I have try and find which one makes sense.
+    flat_rot_1 = vector.RotationMatrix(offset_angle, up)
+    flat_rot_2 = vector.RotationMatrix(-offset_angle, up)
+    if round((flat_rot_1*base_indicator_vector).dot(tangent_2d),4)==1:
+        
+        offset = flat_rot_1
+    else:
+        this = round((flat_rot_2*base_indicator_vector).dot(tangent_2d),4)
+        assert this == 1
+        offset = flat_rot_2
+    
+    flat_rot = vector.RotationMatrix(local_rotation, up)
+    
+    down_rot_matrix= vector.RotationMatrix(-angle, axis)
+    
+    # THIS is for my indicator, which starts at some rotation up top.
+    # like, my default points to +x or +y or something.
+    indicator_matrix = down_rot_matrix * flat_rot * offset
+    
+    # THIS STUFF is for my plate vector which is any other kind of
+    # orientation, but
+    point_change_matrix = down_rot_matrix * flat_rot * up_rot_matrix
+    
+    return indicator_matrix, point_change_matrix
+
 
 def get_rotation_data(from_v,to_v):
     """
