@@ -36,7 +36,18 @@ class Matrix:
         self.v1=v1
         self.v2=v2
         self.v3=v3
+    
+    def __eq__(self,other):
         
+        if type(other)!=type(self):
+            return False
+        
+        v1_ok = (self.v1 == other.v1)
+        v2_ok = (self.v2 == other.v2)
+        v3_ok = (self.v3 == other.v3)
+        
+        return all([v1_ok,v2_ok,v3_ok])
+    
     def __getitem__(self,ind):
         if ind==0:
             return self.v1
@@ -48,17 +59,10 @@ class Matrix:
             raise ValueError
     
     def __repr__(self):
-        s="\n"
-        c1=0
-        c2=0
-        m=3
-        while c1 < m:
-            while c2 < m:
-                s+=str(self[c1][c2])+" "
-                c2+=1
-            s+="\n"
-            c2=0
-            c1+=1
+        s="["
+        s+=f"{self.v1}\n"
+        s+=f"{self.v2}\n"
+        s+=f"{self.v3}]\n"
         return s
     
     def __mul__(self,other):
@@ -219,31 +223,33 @@ def get_face_normal(vertlist):
         center += x
     center = center / len(vertlist)
     
-    vx1 = vertlist[0]
-    vv1 = center - vx1
-    vv1 = vv1.normalize()
-    
-    c = 1
+    c = -1
     m = len(vertlist)
     norms = []
-    while c < m:
-        vx2 = vertlist[c]
+    while c < m-1:
+        
+        vx1 = vertlist[c]
+        vx2 = vertlist[c+1]
+        
+        vv1 = center - vx1
         vv2 = center - vx2
+        
+        vv1 = vv1.normalize()
         vv2 = vv2.normalize()
         
         norm = vv1.cross(vv2)
         norm = norm.normalize()
         norms.append(norm)
-        #if norm.magnitude() == 1:
-            #break
         c += 1
     
     real_norm = Vector(0,0,0)
     for t_norm in norms:
         real_norm += t_norm
+        
     real_norm = real_norm / len(norms)
+    real_norm = real_norm.normalize()
+    assert real_norm.magnitude() != 0
     
-    assert norm.magnitude() != 0
     #print(norm)
     #print(vv1,vv2)
     
@@ -255,7 +261,7 @@ def get_face_normal(vertlist):
     # except AssertionError:
         # raise ValueError("dot product isn't 0, vertlist is not coplanar.")
         
-    return norm
+    return real_norm
     
 def get_edge_normals(vertlist):
     """
@@ -358,7 +364,7 @@ def RotationMatrix(angle,rot_axis):
 
 class Vector:
     
-    def __init__(self,x,y,z):
+    def __init__(self,x,y,z,force_convert_simple_type=False):
         """
         Works basically like a list or a tuple, except it supports
         common vector funtions.
@@ -370,6 +376,11 @@ class Vector:
         self.x = x 
         self.y = y 
         self.z = z 
+        
+        if force_convert_simple_type:
+            self.x=float(x)
+            self.y=float(y)
+            self.z=float(z)
     
     
     def __lt__(self,other):
@@ -397,20 +408,24 @@ class Vector:
     
     def __eq__(self,other):
         
-        if type(other) in [tuple,list]:
+        if type(other) not in [tuple,list,type(self)]:
             #this should... take care of type problems.
-            pass
-        elif type(other)!=type(self):
+            
+            # don't be that agressive, 
+            # I want to be able to do vector == None -> False
+            # raise TypeError
+            
             return False
-        
+            
         if len(self)!=len(other):
             return False
-        c=0
-        l=len(self)
+        
+        c = 0
+        l = len(self)
         while c < l:
-            if self[c]!=other[c]:
+            if self[c] != other[c]:
                 return False
-            c+=1
+            c += 1
        
         return True
     
@@ -616,18 +631,24 @@ def angle_v1v2(v1,v2):
     
 def get_radians_from_vector(x,y):
     angle=0
-    if x>0:
+    if x>0:# and y>0:
         angle=math.atan(y/x)
     if x==0:
         angle=math.atan(y/0.001)
     if x<0:
         angle=math.atan(y/x)+math.pi
-    if x>0 and y<=0:
-        angle=math.atan(y/x)+math.pi*2
-    if x==0 and y<=0:
-        angle=math.atan(y/0.001)+math.pi*2
+    if x > 0 and y <= 0:
+        angle=math.atan(y/x)
+    if x == 0 and y <= 0:
+        angle=math.atan(y/0.001)+math.pi
     return angle
 
+def vector_sum(my_iterable):
+    sum_ob = Vector(0,0,0)
+    for thing in my_iterable:
+        sum_ob +=thing
+    return sum_ob
+    
 def vector_interpolation_step(start,goal,step_size=1.5):
     goal = goal.copy()
     goal = goal.normalize()
