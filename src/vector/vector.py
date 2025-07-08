@@ -1,5 +1,6 @@
 
 import math
+from functools import lru_cache
 """
 This module assumes you know your way around linear algebra and python.
 It will _not: warn you that something you're doing might not be what
@@ -516,6 +517,7 @@ class Vector:
     def __ne__(self,other):
         return not self==other
     
+    @lru_cache(maxsize=500)
     def __truediv__(self,quotient):
         l=[i/quotient for i in self]        
         return Vector(*l)
@@ -528,6 +530,8 @@ class Vector:
     def __rmul__(self,other):
         return self*other
     
+    
+    @lru_cache(maxsize=500)
     def __mul__(self,other):
         """intended for multiplication of the vector with a scalar"""
         if isinstance(other,Vector):
@@ -539,12 +543,18 @@ class Vector:
             
         return Vector(*new_vals)
     
-        
+    
+    @lru_cache(maxsize=500)
     def __sub__(self,v2):
         r=Vector(self[0]-v2[0],self[1]-v2[1],self[2]-v2[2])
         r=round(r,10)
         return r
-        
+    
+    def __hash__(self):
+        stuff=tuple(self)
+        return stuff.__hash__()
+    
+    @lru_cache(maxsize=500)
     def __add__(self,v2):
         v = Vector(self[0]+v2[0],self[1]+v2[1],self[2]+v2[2])
         v = round(v,10)
@@ -599,7 +609,9 @@ class Vector:
         self.x=v.x
         self.y=v.y
         self.z=v.z
-        
+    
+    
+    @lru_cache(maxsize=500)
     def magnitude(self):
         v = self
         l = (v[0]**2+v[1]**2+v[2]**2)**0.5
